@@ -3,21 +3,15 @@
  */
 package com.allendowney.thinkdast;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of a Map using a List of entries, so most
  * operations are linear time.
  *
- * @author downey
  * @param <K>
  * @param <V>
- *
+ * @author downey
  */
 public class MyLinearMap<K, V> implements Map<K, V> {
 
@@ -36,10 +30,12 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 		public K getKey() {
 			return key;
 		}
+
 		@Override
 		public V getValue() {
 			return value;
 		}
+
 		@Override
 		public V setValue(V newValue) {
 			value = newValue;
@@ -63,7 +59,11 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 	 * @param target
 	 */
 	private Entry findEntry(Object target) {
-		// TODO: FILL THIS IN!
+		for (Entry entry : entries) {
+			if (equals(target, entry.getKey())) {
+				return entry;
+			}
+		}
 		return null;
 	}
 
@@ -83,7 +83,7 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
-		for (Map.Entry<K, V> entry: entries) {
+		for (Map.Entry<K, V> entry : entries) {
 			if (equals(target, entry.getValue())) {
 				return true;
 			}
@@ -98,8 +98,8 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 
 	@Override
 	public V get(Object key) {
-		// TODO: FILL THIS IN!
-		return null;
+		Entry e = findEntry(key);
+		return e == null ? null : e.getValue();
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new HashSet<K>();
-		for (Entry entry: entries) {
+		for (Entry entry : entries) {
 			set.add(entry.getKey());
 		}
 		return set;
@@ -118,21 +118,33 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 
 	@Override
 	public V put(K key, V value) {
-		// TODO: FILL THIS IN!
-		return null;
+		Entry e = findEntry(key);
+		V res = null;
+		if (e == null) {
+			entries.add(new Entry(key, value));
+		} else {
+			res = e.getValue();
+			e.setValue(value);
+		}
+		return res;
 	}
 
 	@Override
 	public void putAll(Map<? extends K, ? extends V> map) {
-		for (Map.Entry<? extends K, ? extends V> entry: map.entrySet()) {
+		for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
 			put(entry.getKey(), entry.getValue());
 		}
 	}
 
 	@Override
 	public V remove(Object key) {
-		// TODO: FILL THIS IN!
-		return null;
+		Entry e = findEntry(key);
+		V res = null;
+		if (e != null) {
+			res = e.getValue();
+			entries.remove(e);
+		}
+		return res;
 	}
 
 	@Override
@@ -143,7 +155,7 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 	@Override
 	public Collection<V> values() {
 		Set<V> set = new HashSet<V>();
-		for (Entry entry: entries) {
+		for (Entry entry : entries) {
 			set.add(entry.getValue());
 		}
 		return set;
@@ -159,14 +171,14 @@ public class MyLinearMap<K, V> implements Map<K, V> {
 		Integer value = map.get("Word1");
 		System.out.println(value);
 
-		for (String key: map.keySet()) {
+		for (String key : map.keySet()) {
 			System.out.println(key + ", " + map.get(key));
 		}
 	}
 
 	/**
 	 * Returns a reference to `entries`.
-	 *
+	 * <p>
 	 * This is not part of the Map interface; it is here to provide the functionality
 	 * of `entrySet` in a way that is substantially simpler than the "right" way.
 	 *
