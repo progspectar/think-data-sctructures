@@ -1,10 +1,15 @@
 package com.allendowney.thinkdast;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
- * @param <T>
  * @author downey
+ * @param <T>
+ *
  */
 public class MyArrayList<T> implements List<T> {
     int size;                    // keeps track of the number of elements
@@ -31,27 +36,23 @@ public class MyArrayList<T> implements List<T> {
         mal.add(1);
         mal.add(2);
         mal.add(3);
-        boolean res = mal.containsAll(mal);
-        System.out.println(res);
-//        mal.add(1);
-//        mal.add(2);
-//        mal.add(3);
-//        System.out.println(Arrays.toString(mal.toArray()) + " size = " + mal.size);
-//        mal.remove(2);
-//        mal.remove(2);
-//        mal.remove(2);
-//
-//        System.out.println(Arrays.toString(mal.toArray()) + " size = " + mal.size);
+        System.out.println(Arrays.toString(mal.toArray()) + " size = " + mal.size);
+
+        mal.remove(new Integer(2));
+        System.out.println(Arrays.toString(mal.toArray()) + " size = " + mal.size);
     }
 
     @Override
     public boolean add(T element) {
         if (size >= array.length) {
+            // make a bigger array and copy over the elements
+            @SuppressWarnings("unchecked")
             T[] bigger = (T[]) new Object[array.length * 2];
             System.arraycopy(array, 0, bigger, 0, array.length);
             array = bigger;
         }
-        array[size++] = element;
+        array[size] = element;
+        size++;
         return true;
     }
 
@@ -64,8 +65,8 @@ public class MyArrayList<T> implements List<T> {
         add(element);
 
         // shift the elements
-        for (int i = size - 1; i > index; i--) {
-            array[i] = array[i - 1];
+        for (int i=size-1; i>index; i--) {
+            array[i] = array[i-1];
         }
         // put the new one in the right place
         array[index] = element;
@@ -74,7 +75,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean addAll(Collection<? extends T> collection) {
         boolean flag = true;
-        for (T element : collection) {
+        for (T element: collection) {
             flag &= add(element);
         }
         return flag;
@@ -82,7 +83,6 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> collection) {
-
         throw new UnsupportedOperationException();
     }
 
@@ -100,7 +100,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> collection) {
-        for (Object element : collection) {
+        for (Object element: collection) {
             if (!contains(element)) {
                 return false;
             }
@@ -118,7 +118,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public int indexOf(Object target) {
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i<size; i++) {
             if (equals(target, array[i])) {
                 return i;
             }
@@ -126,9 +126,8 @@ public class MyArrayList<T> implements List<T> {
         return -1;
     }
 
-    /**
-     * Checks whether an element of the array is the target.
-     * <p>
+    /** Checks whether an element of the array is the target.
+     *
      * Handles the special case that the target is null.
      *
      * @param target
@@ -158,7 +157,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public int lastIndexOf(Object target) {
         // see notes on indexOf
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = size-1; i>=0; i--) {
             if (equals(target, array[i])) {
                 return i;
             }
@@ -194,20 +193,18 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T remove(int index) {
-        T old = get(index);
-        // shift the elements
-        for (int i = index + 1; i < size; i++) {
-            array[i - 1] = array[i];
+        T element = get(index);
+        for (int i=index; i<size-1; i++) {
+            array[i] = array[i+1];
         }
-        // put null in the right place
-        array[--size] = null;
-        return old;
+        size--;
+        return element;
     }
 
     @Override
     public boolean removeAll(Collection<?> collection) {
         boolean flag = true;
-        for (Object obj : collection) {
+        for (Object obj: collection) {
             flag &= remove(obj);
         }
         return flag;
@@ -220,7 +217,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public T set(int index, T element) {
-        //no need to check index get will do it
+        // no need to check index; get will do it for us
         T old = get(index);
         array[index] = element;
         return old;
