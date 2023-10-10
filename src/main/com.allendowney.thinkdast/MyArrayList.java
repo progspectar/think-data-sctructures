@@ -1,19 +1,22 @@
 package com.allendowney.thinkdast;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
+ * @param <T> public abstract class AbstractList<E>
+ *            extends AbstractCollection<E>
+ *            implements List<E>
  * @author downey
- * @param <T>
- *
  */
-public class MyArrayList<T> implements List<T> {
+public class MyArrayList<T> extends AbstractList<T> {
     int size;                    // keeps track of the number of elements
     private T[] array;           // stores the elements
+    private static final int DEFAULT_CAPACITY = 10;
+
+    /**
+     * Shared empty array instance used for empty instances.
+     */
+    private static final Object[] EMPTY_ELEMENTDATA = {};
 
     /**
      *
@@ -23,8 +26,22 @@ public class MyArrayList<T> implements List<T> {
         // You can't instantiate an array of T[], but you can instantiate an
         // array of Object and then typecast it.  Details at
         // http://www.ibm.com/developerworks/java/library/j-jtp01255/index.html
-        array = (T[]) new Object[10];
+        array = (T[]) new Object[DEFAULT_CAPACITY];
         size = 0;
+    }
+
+    public MyArrayList(Collection<? extends T> c) {
+        Object[] a = c.toArray();
+        if ((size = a.length) != 0) {
+            if (c.getClass() == ArrayList.class) {
+                array = (T[]) a;
+            } else {
+                array = (T[]) Arrays.copyOf(a, size, Object[].class);
+            }
+        } else {
+            // replace with empty array.
+            array = (T[]) EMPTY_ELEMENTDATA;
+        }
     }
 
     /**
@@ -32,6 +49,8 @@ public class MyArrayList<T> implements List<T> {
      */
     public static void main(String[] args) {
         // run a few simple tests
+        List<Integer> arrl = new ArrayList<>();
+
         MyArrayList<Integer> mal = new MyArrayList<Integer>();
         mal.add(1);
         mal.add(2);
@@ -65,8 +84,8 @@ public class MyArrayList<T> implements List<T> {
         add(element);
 
         // shift the elements
-        for (int i=size-1; i>index; i--) {
-            array[i] = array[i-1];
+        for (int i = size - 1; i > index; i--) {
+            array[i] = array[i - 1];
         }
         // put the new one in the right place
         array[index] = element;
@@ -75,7 +94,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean addAll(Collection<? extends T> collection) {
         boolean flag = true;
-        for (T element: collection) {
+        for (T element : collection) {
             flag &= add(element);
         }
         return flag;
@@ -100,7 +119,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> collection) {
-        for (Object element: collection) {
+        for (Object element : collection) {
             if (!contains(element)) {
                 return false;
             }
@@ -118,7 +137,7 @@ public class MyArrayList<T> implements List<T> {
 
     @Override
     public int indexOf(Object target) {
-        for (int i = 0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             if (equals(target, array[i])) {
                 return i;
             }
@@ -126,8 +145,9 @@ public class MyArrayList<T> implements List<T> {
         return -1;
     }
 
-    /** Checks whether an element of the array is the target.
-     *
+    /**
+     * Checks whether an element of the array is the target.
+     * <p>
      * Handles the special case that the target is null.
      *
      * @param target
@@ -147,38 +167,14 @@ public class MyArrayList<T> implements List<T> {
     }
 
     @Override
-    public Iterator<T> iterator() {
-        // make a copy of the array
-        T[] copy = Arrays.copyOf(array, size);
-        // make a list and return an iterator
-        return Arrays.asList(copy).iterator();
-    }
-
-    @Override
     public int lastIndexOf(Object target) {
         // see notes on indexOf
-        for (int i = size-1; i>=0; i--) {
+        for (int i = size - 1; i >= 0; i--) {
             if (equals(target, array[i])) {
                 return i;
             }
         }
         return -1;
-    }
-
-    @Override
-    public ListIterator<T> listIterator() {
-        // make a copy of the array
-        T[] copy = Arrays.copyOf(array, size);
-        // make a list and return an iterator
-        return Arrays.asList(copy).listIterator();
-    }
-
-    @Override
-    public ListIterator<T> listIterator(int index) {
-        // make a copy of the array
-        T[] copy = Arrays.copyOf(array, size);
-        // make a list and return an iterator
-        return Arrays.asList(copy).listIterator(index);
     }
 
     @Override
@@ -194,8 +190,8 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public T remove(int index) {
         T element = get(index);
-        for (int i=index; i<size-1; i++) {
-            array[i] = array[i+1];
+        for (int i = index; i < size - 1; i++) {
+            array[i] = array[i + 1];
         }
         size--;
         return element;
@@ -204,7 +200,7 @@ public class MyArrayList<T> implements List<T> {
     @Override
     public boolean removeAll(Collection<?> collection) {
         boolean flag = true;
-        for (Object obj: collection) {
+        for (Object obj : collection) {
             flag &= remove(obj);
         }
         return flag;
